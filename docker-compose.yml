@@ -12,11 +12,15 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-changeme-min-32-chars-for-security}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     env_file:
       - .env
     volumes:
-      - app-data:/app/data
-      - ./logs:/app/logs
+      # Persist SQLite database
+      - bcs-data:/app/data
+      # Persist uploaded files
+      - bcs-uploads:/app/uploads
     networks:
       - bcs-network
     healthcheck:
@@ -34,29 +38,10 @@ services:
           cpus: '0.25'
           memory: 128M
 
-  # Optional: Add database service if needed
-  # db:
-  #   image: postgres:15-alpine
-  #   container_name: bcs-db
-  #   restart: unless-stopped
-  #   environment:
-  #     - POSTGRES_DB=${DB_NAME:-bcs}
-  #     - POSTGRES_USER=${DB_USER:-bcs}
-  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
-  #   volumes:
-  #     - db-data:/var/lib/postgresql/data
-  #   networks:
-  #     - bcs-network
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcs}"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-
 networks:
   bcs-network:
     driver: bridge
 
 volumes:
-  app-data:
-  # db-data:
+  bcs-data:
+  bcs-uploads:

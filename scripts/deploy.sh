@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# BCS Deployment Script
+# BCS CMS Deployment Script
 # Usage: ./scripts/deploy.sh [staging|production]
 
 ENVIRONMENT="${1:-staging}"
@@ -51,7 +51,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
     log_error "Docker Compose is not installed"
     exit 1
 fi
@@ -73,14 +73,29 @@ else
     docker-compose -f docker-compose.yml up -d
 fi
 
+# Wait for migrations to complete
+log_info "Waiting for application to initialize (running migrations)..."
+sleep 5
+
 # Health check
 log_info "Waiting for services to be healthy..."
-sleep 10
+MAX_RETRIES=12
+RETRY_COUNT=0
 
-if docker compose version &> /dev/null; then
-    HEALTH_STATUS=$(docker compose ps --format json 2>/dev/null | jq -r '.[].Health' 2>/dev/null || echo "unknown")
-else
-    HEALTH_STATUS=$(docker-compose ps 2>/dev/null | grep -c "healthy" || echo "0")
+while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+    if curl -sf --max-time 5 "http://localhost:${APP_PORT:-3000}/health" > /dev/null 2>&1; then
+        log_info "Application is healthy!"
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    log_warn "Health check attempt $RETRY_COUNT failed, retrying..."
+    sleep 5
+done
+
+if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
+    log_error "Health checks failed after $MAX_RETRIES attempts"
+    docker compose logs app
+    exit 1
 fi
 
 log_info "Deployment complete!"

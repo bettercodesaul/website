@@ -8,8 +8,9 @@ A lightweight CMS backend built with Node.js and Express, featuring JWT authenti
 
 - Node.js 20+
 - npm
+- Docker & Docker Compose (for containerized deployment)
 
-### Installation
+### Local Development
 
 ```bash
 # Install dependencies
@@ -26,6 +27,16 @@ npm start
 
 # Development mode with auto-reload
 npm run dev
+```
+
+### Docker Deployment
+
+```bash
+# Build and run
+docker compose up --build
+
+# Or use the deploy script
+./scripts/deploy.sh staging
 ```
 
 ## API Endpoints
@@ -89,25 +100,50 @@ curl -X POST http://localhost:3000/api/auth/login \
   -d '{"email":"admin@example.com","password":"password"}'
 ```
 
-## Example: Create a Page
+## Deployment
+
+### Staging Deployment
 
 ```bash
-curl -X POST http://localhost:3000/api/pages \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "title": "About Us",
-    "slug": "about-us",
-    "content": "Welcome to our company...",
-    "excerpt": "Learn about our company",
-    "status": "published"
-  }'
+./scripts/deploy.sh staging
 ```
 
-## Health Endpoints
+### Production Deployment
 
-- `/health` - Liveness probe
-- `/ready` - Readiness probe
+```bash
+./scripts/deploy.sh production
+```
+
+### Rollback
+
+```bash
+# Rollback to previous version
+./scripts/rollback.sh previous
+
+# Rollback to specific version
+./scripts/rollback.sh v1.2.3
+```
+
+### Health Check
+
+```bash
+./scripts/healthcheck.sh
+```
+
+## CI/CD Pipeline
+
+The project uses GitHub Actions for CI/CD:
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `ci.yml` | Push to main/develop, PRs | Lint, test, build, deploy |
+| `release.yml` | Version tags (v*) | Create release and push image |
+| `security.yml` | Push, weekly schedule | Security scanning |
+
+### Environments
+
+- **Staging**: Auto-deployed from `develop` branch
+- **Production**: Auto-deployed from `main` branch
 
 ## Configuration
 
@@ -118,43 +154,72 @@ curl -X POST http://localhost:3000/api/pages \
 | `NODE_ENV` | `production` | Node environment |
 | `PORT` | `3000` | Application port |
 | `DB_PATH` | `./data/bcs.db` | SQLite database path |
-| `JWT_SECRET` | (dev default) | JWT signing secret |
+| `JWT_SECRET` | (required) | JWT signing secret (min 32 chars) |
 | `LOG_LEVEL` | `info` | Logging verbosity |
 
-## Project Structure
+### Docker Compose Services
 
-```
-bcs/
-├── src/
-│   ├── db/
-│   │   └── database.js      # Database connection
-│   ├── middleware/
-│   │   └── auth.js          # JWT authentication
-│   ├── models/
-│   │   ├── User.js          # User model
-│   │   ├── Page.js          # Page model
-│   │   └── Media.js         # Media model
-│   └── routes/
-│       ├── auth.js          # Auth routes
-│       ├── pages.js         # Pages routes
-│       ├── users.js         # Users routes
-│       └── media.js         # Media routes
-├── migrations/
-│   └── 001_initial_schema.sql
-├── scripts/
-│   ├── migrate.js           # Migration runner
-│   └── ...
-├── test/
-│   └── server.test.js       # Integration tests
-├── server.js                # Express app entry
-└── package.json
-```
+| Service | Port | Description |
+|---------|------|-------------|
+| `app` | 3000 | Main application with SQLite |
+
+### Volumes
+
+| Volume | Purpose |
+|--------|---------|
+| `bcs-data` | SQLite database persistence |
+| `bcs-uploads` | Uploaded media files |
+
+## Health Endpoints
+
+- `/health` - Liveness probe
+- `/ready` - Readiness probe
 
 ## Testing
 
 ```bash
 # Run tests
 npm test
+```
+
+## Security
+
+- Container runs as non-root user
+- Security scanning in CI pipeline (Trivy, CodeQL, npm audit)
+- JWT authentication for protected endpoints
+- SQLite database with file-based persistence
+
+## Troubleshooting
+
+### Database Issues
+
+```bash
+# Reset database (WARNING: deletes all data)
+docker compose down -v
+docker compose up --build
+```
+
+### Build Issues
+
+```bash
+# Clean build cache
+docker builder prune
+
+# Rebuild from scratch
+docker compose build --no-cache
+```
+
+### Deployment Issues
+
+```bash
+# Check container status
+docker compose ps
+
+# View logs
+docker compose logs -f app
+
+# Restart services
+docker compose restart
 ```
 
 ## License
