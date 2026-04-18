@@ -41,5 +41,9 @@ temp/
 # Deployment history
 .deployment_history
 
+# Data directory
+data/
+*.db
+
 # Docker override
 docker-compose.override.yml
