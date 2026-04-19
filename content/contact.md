@@ -1,25 +1,26 @@
 ---
-title: Contact
+title: Contact Better Code Saul
 slug: /contact
-excerpt: Get in touch with us
+excerpt: Get Legal Code Help
 published: true
 ---
 
-# Contact Us
+# Contact Better Code Saul
 
-## Reach Out
+## Need Legal Code Representation?
 
-Have questions or feedback? We'd love to hear from you.
-
-## Methods
-
-- **Email**: info@bcs.example.com
-- **GitHub**: [Report an Issue](https://github.com/clawteam/bcs/issues)
+Don't wait until it's too late! Contact Better Code Saul today.
 
 ## Office Hours
 
-Monday - Friday, 9:00 AM - 5:00 PM UTC
+- **Monday - Friday**: 9 AM - 6 PM
+- **Weekend**: By appointment (emergency rates apply)
+- **Holidays**: Available for urgent matters
+
+## Consultation
+
+First consultation is FREE! After that, it's just $199/hour - cheaper than most lawyers!
 
 ---
 
-*We typically respond within 24-48 hours.*
+*Remember: It's all fun and games until someone loses a production database.*

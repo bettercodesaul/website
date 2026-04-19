@@ -1,31 +1,23 @@
 ---
-title: About Us
+title: About Better Code Saul
 slug: /about
-excerpt: Learn more about BCS
+excerpt: Your Legal Code Advocate
 published: true
 ---
 
-# About BCS
+# About Better Code Saul
 
-## Our Story
+## Your Legal Code Advocate
 
-BCS (Building Content Systems) started with a simple idea: content management should be straightforward, fast, and reliable.
+Just like Saul Goodman fought for his clients, Better Code Saul fights for your codebase.
 
-## What We Do
+## Why Choose Better Code Saul?
 
-We focus on delivering:
-
-1. **Static Site Generation** - Pre-rendered HTML for maximum performance
-2. **Simple Content Management** - Markdown-based content editing
-3. **GitHub Pages Deployment** - Free, reliable hosting
-
-## Technology Stack
-
-- Markdown for content
-- Node.js for building
-- GitHub Pages for hosting
-- No database required
+- **Experience**: Years of courtroom... I mean, coding room experience
+- **Results**: Cases won, bugs squashed, deployments delivered
+- **Availability**: On call 24/7 for your code emergencies
+- **Ethics**: Questionable... just kidding! Fully licensed and bonded
 
 ---
 
-*Static sites are the future of fast, secure web publishing.*
+*Located in the heart of Albuquerque's tech district.*
