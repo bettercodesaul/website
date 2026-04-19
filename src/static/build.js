@@ -85,9 +85,33 @@ function generateLayout({ title, excerpt, content, slug }) {
 </html>`;
 }
 
+function copyDirectory(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirectory(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+      console.log(`Copied: ${destPath}`);
+    }
+  }
+}
+
 function build() {
   if (!fs.existsSync(DIST_DIR)) {
     fs.mkdirSync(DIST_DIR, { recursive: true });
+  }
+
+  // Copy static assets from public/ to dist/
+  const PUBLIC_DIR = path.join(process.cwd(), 'public');
+  if (fs.existsSync(PUBLIC_DIR)) {
+    copyDirectory(PUBLIC_DIR, DIST_DIR);
+    console.log('Static assets copied to dist/');
   }
 
   const files = fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.md'));
