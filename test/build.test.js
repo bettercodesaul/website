@@ -23,7 +23,7 @@ describe('Static Site Build', () => {
 
     const content = fs.readFileSync(indexPath, 'utf8');
     assert.ok(content.includes('<!DOCTYPE html>'));
-    assert.ok(content.includes('<title>Welcome to BCS</title>'));
+    assert.ok(content.includes('<title>Better Code Saul</title>'));
   });
 
   test('about page is generated', () => {
@@ -31,7 +31,7 @@ describe('Static Site Build', () => {
     assert.ok(fs.existsSync(aboutPath));
 
     const content = fs.readFileSync(aboutPath, 'utf8');
-    assert.ok(content.includes('<title>About Us</title>'));
+    assert.ok(content.includes('<title>About Better Code Saul</title>'));
   });
 
   test('contact page is generated', () => {
@@ -39,7 +39,7 @@ describe('Static Site Build', () => {
     assert.ok(fs.existsSync(contactPath));
 
     const content = fs.readFileSync(contactPath, 'utf8');
-    assert.ok(content.includes('<title>Contact</title>'));
+    assert.ok(content.includes('<title>Contact Better Code Saul</title>'));
   });
 
   test('generated HTML contains navigation', () => {
@@ -54,7 +54,7 @@ describe('Static Site Build', () => {
     const indexPath = path.join(DIST_DIR, 'index.html');
     const content = fs.readFileSync(indexPath, 'utf8');
 
-    assert.ok(content.includes('BCS - Building Content Systems'));
+    assert.ok(content.includes('Better Code Saul'));
   });
 
   test('unpublished pages are not generated', () => {
