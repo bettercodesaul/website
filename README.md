@@ -87,7 +87,7 @@ npm run build
 
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
-| `ci.yml` | Push, PRs | Lint, test, build |
+| `ci.yml` | Push, PRs | Test and build static site |
 | `deploy.yml` | Push to main | Deploy to GitHub Pages |
 
 ## Supported Markdown
