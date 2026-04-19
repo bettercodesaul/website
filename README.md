@@ -1,6 +1,6 @@
-# BCS Content Management System
+# BCS Static Site Generator
 
-A lightweight CMS backend built with Node.js and Express, featuring JWT authentication, SQLite database, and RESTful API.
+A lightweight static site generator that converts Markdown content into HTML pages for GitHub Pages deployment.
 
 ## Quick Start
 
@@ -8,172 +8,108 @@ A lightweight CMS backend built with Node.js and Express, featuring JWT authenti
 
 - Node.js 20+
 - npm
-- Docker & Docker Compose (for containerized deployment)
 
-### Local Development
+### Build Locally
 
 ```bash
 # Install dependencies
 npm install
 
-# Copy environment template
-cp .env.example .env
+# Build static site
+npm run build
 
-# Run database migrations
-npm run migrate
-
-# Start server
-npm start
-
-# Development mode with auto-reload
-npm run dev
+# View generated files
+ls dist/
 ```
 
-### Docker Deployment
+### Development
 
-```bash
-# Build and run
-docker compose up --build
+Add or edit Markdown files in the `content/` directory:
 
-# Or use the deploy script
-./scripts/deploy.sh staging
+```markdown
+---
+title: Page Title
+slug: /page-slug
+excerpt: Short description
+published: true
+---
+
+# Your content here
+
+Write in **Markdown** format.
 ```
 
-## API Endpoints
-
-### Authentication
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-
-### Pages
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/pages` | List all pages | - |
-| GET | `/api/pages/:id` | Get page by ID | - |
-| GET | `/api/pages/slug/:slug` | Get page by slug | - |
-| POST | `/api/pages` | Create page | Admin/Editor |
-| PUT | `/api/pages/:id` | Update page | Admin/Editor |
-| DELETE | `/api/pages/:id` | Delete page | Admin |
-
-### Users
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/users/me` | Get current user | Required |
-| PUT | `/api/users/me` | Update current user | Required |
-| GET | `/api/users` | List all users | Admin |
-| GET | `/api/users/:id` | Get user by ID | Admin |
-| DELETE | `/api/users/:id` | Delete user | Admin |
-
-### Media
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/media` | List all media | Required |
-| GET | `/api/media/:id` | Get media by ID | Required |
-| POST | `/api/media/upload` | Upload file | Admin/Editor |
-| DELETE | `/api/media/:id` | Delete media | Admin |
-
-## Authentication
-
-All protected endpoints require a JWT token in the `Authorization` header:
+## Content Structure
 
 ```
-Authorization: Bearer <token>
+bcs/
+├── content/           # Markdown source files
+│   ├── home.md       # Becomes dist/index.html
+│   ├── about.md      # Becomes dist/about/index.html
+│   └── contact.md    # Becomes dist/contact/index.html
+├── dist/             # Generated HTML (deploy this)
+├── src/static/
+│   └── build.js      # Static site generator
+└── package.json
 ```
 
-Get a token by registering or logging in:
+## Frontmatter Fields
 
-```bash
-# Register
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"password","name":"Admin"}'
-
-# Login
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"password"}'
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Page title (shown in header and browser tab) |
+| `slug` | string | URL path (e.g., `/about`) |
+| `excerpt` | string | Short description |
+| `published` | boolean | Set to `true` to include in build |
 
 ## Deployment
 
-### Staging Deployment
+### GitHub Pages
+
+The site automatically deploys to GitHub Pages when you push to `main`:
+
+1. Go to your repository Settings > Pages
+2. Set Source to "GitHub Actions"
+3. Push to main branch
+
+The workflow in `.github/workflows/deploy.yml` handles the rest.
+
+### Manual Deploy
 
 ```bash
-./scripts/deploy.sh staging
-```
+# Build
+npm run build
 
-### Production Deployment
-
-```bash
-./scripts/deploy.sh production
-```
-
-### Rollback
-
-```bash
-# Rollback to previous version
-./scripts/rollback.sh previous
-
-# Rollback to specific version
-./scripts/rollback.sh v1.2.3
-```
-
-### Health Check
-
-```bash
-./scripts/healthcheck.sh
+# Deploy dist/ folder to your hosting
 ```
 
 ## CI/CD Pipeline
 
-The project uses GitHub Actions for CI/CD:
-
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
-| `ci.yml` | Push to main/develop, PRs | Lint, test, build, deploy |
-| `release.yml` | Version tags (v*) | Create release and push image |
-| `security.yml` | Push, weekly schedule | Security scanning |
+| `ci.yml` | Push, PRs | Lint, test, build |
+| `deploy.yml` | Push to main | Deploy to GitHub Pages |
 
-### Environments
+## Supported Markdown
 
-- **Staging**: Auto-deployed from `develop` branch
-- **Production**: Auto-deployed from `main` branch
+- Headers (`#`, `##`, `###`)
+- Bold (`**text**`) and italic (`*text*`)
+- Links (`[text](url)`)
+- Lists (`* item`)
+- Horizontal rules (`---`)
 
 ## Configuration
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NODE_ENV` | `production` | Node environment |
-| `PORT` | `3000` | Application port |
-| `DB_PATH` | `./data/bcs.db` | SQLite database path |
-| `JWT_SECRET` | (required) | JWT signing secret (min 32 chars) |
-| `LOG_LEVEL` | `info` | Logging verbosity |
+None required. The build is fully static.
 
-### Docker Compose Services
+### Customization
 
-| Service | Port | Description |
-|---------|------|-------------|
-| `app` | 3000 | Main application with SQLite |
-
-### Volumes
-
-| Volume | Purpose |
-|--------|---------|
-| `bcs-data` | SQLite database persistence |
-| `bcs-uploads` | Uploaded media files |
-
-## Health Endpoints
-
-- `/health` - Liveness probe
-- `/ready` - Readiness probe
+Edit `src/static/build.js` to customize:
+- HTML layout and styling
+- Navigation menu
+- Markdown parsing rules
 
 ## Testing
 
@@ -182,45 +118,21 @@ The project uses GitHub Actions for CI/CD:
 npm test
 ```
 
-## Security
-
-- Container runs as non-root user
-- Security scanning in CI pipeline (Trivy, CodeQL, npm audit)
-- JWT authentication for protected endpoints
-- SQLite database with file-based persistence
-
 ## Troubleshooting
 
-### Database Issues
+### Build Fails
 
 ```bash
-# Reset database (WARNING: deletes all data)
-docker compose down -v
-docker compose up --build
+# Clean and rebuild
+npm run clean
+npm run build
 ```
 
-### Build Issues
+### Page Not Generated
 
-```bash
-# Clean build cache
-docker builder prune
-
-# Rebuild from scratch
-docker compose build --no-cache
-```
-
-### Deployment Issues
-
-```bash
-# Check container status
-docker compose ps
-
-# View logs
-docker compose logs -f app
-
-# Restart services
-docker compose restart
-```
+- Check `published: true` in frontmatter
+- Verify Markdown syntax
+- Check console output for errors
 
 ## License
 
